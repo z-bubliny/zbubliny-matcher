@@ -8,10 +8,11 @@ class LanguageNotSupported(RuntimeError):
 
 
 class SimpleWord2VecMatcher:
-    def __init__(self):
+    def __init__(self, debug=True):
         self.models = {}
         self.chunker = SimpleChunker()
         self.translator = Translator()
+        self.debug = debug
 
     def add_language_model(self, language, model):
         self.models[language] = model
@@ -21,11 +22,17 @@ class SimpleWord2VecMatcher:
         model = load_model(path)
         self.add_language_model(language, model)
 
+    def match_keyword_sentence(self, model, keyword, sentence):
+        result = self.model.wv.n_similarity([keyword], sentence)
+        if self.debug:
+            print("Matching {0} against {1} => {2}".format(keyword, sentence, result))
+        return result
+
     def match_keyword_text(self, model, keyword, sentences, text):
         if keyword in text:
             return 1.0
         elif keyword in model.wv.vocab:
-            return max(self.model.wv.n_similarity([keyword], sentence))
+            return max(self.match_keyword_sentence(model, keyword, sentence) for sentence in sentences)
         else:
             return 0.0
 
