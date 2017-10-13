@@ -8,7 +8,7 @@ options = dict(
     packages=find_packages(),
     license='MIT',
     description='Matchers for zbubliny',
-    long_description=__doc__.strip(),
+    # long_description=__doc__.strip(),
     # author='Jan Pipek',
     # author_email='jan.pipek@gmail.com',
     # url='https://github.com/janpipek/physt',
@@ -33,6 +33,6 @@ options = dict(
     ]
 )
 
-extras = options['extras_require']
+# extras = options['extras_require']
 # extras['full'] = list(set(itertools.chain.from_iterable(extras.values())))
 setup(**options)
