@@ -19,6 +19,7 @@ options = dict(
     #},
     entry_points = {
         'console_scripts' : [
+            'zbubliny = zbubliny_matcher.cli_interface:run'
         ]
     },
     classifiers=[
