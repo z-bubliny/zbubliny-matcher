@@ -1,33 +1,31 @@
 import requests
-import json
+
 
 class WOT_API:
 
     api_key = "e404cccc3b85ad275f20d719a8065e6d77ac8ee6"
 
     @staticmethod
-    def getRating(host):
+    def get_rating(host):
         link = "http://api.mywot.com/0.4/public_link_json2?hosts=" + host + "/&key=" + WOT_API.api_key
         r = requests.get(link)
-        print (r.content.decode())
+        # print (r.content.decode())
         return r.json()
 
-
-
     @staticmethod
-    def getTrustworthines(host):
+    def get_trustworthiness(host):
         """Returns number between 0 - 100, meaning the site trustworthyness in percent, returns -1 if site unknown"""
-        response = WOT_API.getRating(host)
         try:
+            response = WOT_API.get_rating(host)
             return response[list(response.keys())[0]]["0"][0]
         except:
             return -1
 
     @staticmethod
-    def getFlags(host):
+    def get_flags(host):
         """Returns dictionary in format 'Condition':How confident I am"""
         """For example: {'Other': 6, 'Online tracking': 48, 'Good site': 99} (This is for google)"""
-        response = WOT_API.getRating(host)
+        response = WOT_API.get_rating(host)
         hazards = response[list(response.keys())[0]]["categories"]
 
         flags = {}
@@ -40,4 +38,5 @@ class WOT_API:
         return flags
 
 
-print (WOT_API.getFlags("www.google.com"))
+if __name__ == "__main__":
+    print (WOT_API.get_flags("www.google.com"))

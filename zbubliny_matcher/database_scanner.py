@@ -3,7 +3,7 @@ import os
 import click
 
 from .matchers import SimpleMatcher
-from .site_trustworthyness import WOT_API
+from .site_trustworthiness import WOT_API
 
 
 class DatabaseScanner:
@@ -55,6 +55,6 @@ def run_scanner(keywords, language, trustworthiness, all):
     ds = DatabaseScanner(all=all)
     for article, relevance in ds.search_keywords(keywords, keyword_language=language):
         if trustworthiness:
-            nice = WOT_API.getTrustworthyness(article["source"])
+            nice = WOT_API.get_trustworthiness(article["source"])
             print("* {0} {1} [{2} %]".format(article["title"], article["source"], nice))
         print("* {0} {1}".format(article["title"], article["source"]))
