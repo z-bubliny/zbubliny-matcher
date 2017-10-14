@@ -1,6 +1,7 @@
 import click
 import os
 import glob
+import codecs
 
 
 @click.command()
@@ -16,15 +17,14 @@ def run_it(keywords, vector_dir, text_dir, keyword_language, source_language, li
 
     m = SimpleWord2VecMatcher(debug=debug)
     print("Loading model...")
-
     m.load_language_model("it", os.path.join(vector_dir, "wiki.{0}.vec".format(source_language)))
+    print("Model loaded.")
 
     for i, filename in enumerate(glob.glob(os.path.join(text_dir, "*.txt"))):
-        with open(filename, "r") as f:
+        with codecs.open(filename, "r", encoding="utf-8") as f:
             text = f.read()
-            print("Testing file {0}...".format((filename)))
             score = m(text, keywords, source_language, keyword_language)
-            print("Achieved score: {0}".format(score))
+            print("{0}: {1}".format(filename, score))
 
         if limit > 0 and i >= limit - 1:
             break

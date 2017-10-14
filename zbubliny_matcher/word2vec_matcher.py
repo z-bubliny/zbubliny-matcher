@@ -1,18 +1,14 @@
-from .chunkers import SimpleChunker
-from googletrans import Translator
 from typing import List
-import re
 
-
-class LanguageNotSupported(RuntimeError):
-    pass
+from .chunkers import SimpleChunker
+from .exceptions import LanguageNotSupported
+from .translating import translate
 
 
 class SimpleWord2VecMatcher:
     def __init__(self, debug=True):
         self.models = {}
         self.chunker = SimpleChunker()
-        self.translator = Translator()
         self.debug = debug
 
     def add_language_model(self, language: str, model):
@@ -55,10 +51,7 @@ class SimpleWord2VecMatcher:
             [word for word in self.chunker.chunk_words(sentence) if word in model.wv.vocab]
             for sentence in self.chunker.chunk_sentences(text)
         ]
-        try:
-            keywords_translated = [self.translator.translate(keyword, text_language, keyword_language).text for keyword in keywords]
-        except ValueError:
-            raise LanguageNotSupported("Google translate does not support translation from {0} to {1}.".format(keyword_language, text_language))
+        keywords_translated = [translate(keyword, text_language, keyword_language) for keyword in keywords]
         scores = [self.match_keyword_text(model, keyword, sentences, text) for keyword in keywords_translated]
         if scores:
             return max(scores)
