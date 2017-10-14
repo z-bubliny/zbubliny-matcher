@@ -12,7 +12,7 @@ app = Flask(__name__)
 from werkzeug.contrib.fixers import ProxyFix
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
-@app.route('/bot', methods=['GET'])
+@app.route('/bot/', methods=['GET'])
 def verify():
     print(request.args)
     # when the endpoint is registered as a webhook, it must echo back
@@ -25,7 +25,7 @@ def verify():
     return "Hello world", 200
 
 
-@app.route('/bot', methods=['POST'])
+@app.route('/bot/', methods=['POST'])
 def webhook():
     data = request.get_json()
     print(data)
