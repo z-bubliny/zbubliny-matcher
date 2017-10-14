@@ -28,42 +28,54 @@ def verify():
 @app.route('/bot/', methods=['POST'])
 def webhook():
     data = request.get_json()
-    print(data)
 
     # endpoint for processing incoming messaging events
-    # try:
-    #     data = request.get_json()
-    #     log(data)  # you may not want to log every incoming message in production, but it's good for testing
-    #
-    #     if data["object"] == "page":
-    #
-    #         for entry in data["entry"]:
-    #             for messaging_event in entry["messaging"]:
-    #
-    #                 if messaging_event.get("message"):  # someone sent us a message
-    #
-    #                     sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
-    #                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
-    #                     try:
-    #                         message_text = messaging_event["message"]["text"]  # the message's text
-    #
-    #                         reply=predict(message_text)
-    #                         send_message(sender_id, str(reply))
-    #                     except:
-    #                         send_message(sender_id,str("Sorry! I didn't get that."))
-    #                 if messaging_event.get("delivery"):  # delivery confirmation
-    #                     pass
-    #
-    #                 if messaging_event.get("optin"):  # optin confirmation
-    #                     pass
-    #
-    #                 if messaging_event.get("postback"):  # user clicked/tapped "postback" button in earlier message
-    #                     pass
-    #
-    #     return "ok", 200
-    # except:
-    return "ok", 200
-#
+    try:
+        data = request.get_json()
+        # log(data)  # you may not want to log every incoming message in production, but it's good for testing
+
+        if data["object"] == "page":
+
+            for entry in data["entry"]:
+                for messaging_event in entry["messaging"]:
+
+                    if messaging_event.get("message"):  # someone sent us a message
+
+                        sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
+                        recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
+                        try:
+                            message_text = messaging_event["message"]["text"]  # the message's text
+
+                            cmd, word = message_text.split(" ", 1)
+                            if cmd == "subscribe":
+                                reply = "Wll be implemented soon"
+                            elif cmd == "history":
+                                from .database_scanner import DatabaseScanner
+                                ds = DatabaseScanner()
+                                ds.all = True
+                                reply = ""
+                                for article, relevance in ds.search_keywords([word.split()], keyword_language="cs", limit=5):
+                                    reply += "{0} : {1}\n\n".format(article["title"], article["source"])
+                            else:
+                                reply = "Unknown command: {0}".format(cmd)
+
+                            send_message(sender_id, str(reply))
+                        except:
+                            send_message(sender_id,str("Sorry! I didn't get that."))
+                    if messaging_event.get("delivery"):  # delivery confirmation
+                        pass
+
+                    if messaging_event.get("optin"):  # optin confirmation
+                        pass
+
+                    if messaging_event.get("postback"):  # user clicked/tapped "postback" button in earlier message
+                        pass
+
+        return "ok", 200
+    except:
+        return "not ok", 200
+
+
 def send_message(recipient_id, message_text):
     print("sending message to {recipient}: {text}".format(recipient=recipient_id, text=message_text))
 

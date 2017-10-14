@@ -33,22 +33,28 @@ class DatabaseScanner:
         print(query)
         cursor = self.get_cursor()
         cursor.execute(query)
-        yield from ({
-            "language": row[0],
-            "title": row[1],
-            "body": row[2],
-            "source": row[3]
-        } for row in cursor)
+        row = cursor.fetchone()
+        while row:
+            yield {
+                "language": row[0],
+                "title": row[1],
+                "body": row[2],
+                "source": row[3]
+            }
+            row = cursor.fetchone()
 
-    def search_keywords(self, keywords, keyword_language):
+    def search_keywords(self, keywords, keyword_language, limit=1000000):
         checked = set()
-        for article in self.fetch_articles():
+        for i, article in enumerate(self.fetch_articles()):
             if article["source"] in checked:
                 continue
             checked.add(article["source"])
             relevance = self.matcher(article["title"] + article["body"], keywords, article["language"] or "en", keyword_language)
             if relevance > self.threshold:
                 yield article, relevance
+                i += 1
+            if i >= limit:
+                return
 
 
 @click.command()
