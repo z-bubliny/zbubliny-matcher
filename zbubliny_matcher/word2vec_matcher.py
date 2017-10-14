@@ -5,8 +5,9 @@ from .exceptions import LanguageNotSupported
 from .translating import translate
 
 
-class SimpleWord2VecMatcher:
-    def __init__(self, debug=True):
+class Word2VecMatcher:
+    """Abstract base class for word2vec matchers."""
+    def __init__(self, debug=False):
         self.models = {}
         self.chunker = SimpleChunker()
         self.debug = debug
@@ -20,14 +21,6 @@ class SimpleWord2VecMatcher:
         self.add_language_model(language, model)
         if self.debug:
             print("Loaded model for {0} from {1}.".format(language, path))
-
-    def match_keyword_sentence(self, model, keyword, sentence: List) -> float:
-        if not keyword or not sentence:
-            return 0.0
-        result = model.wv.n_similarity([keyword], sentence)
-        if self.debug:
-            print("Matching {0} against {1} => {2}".format(keyword, sentence, result))
-        return result
 
     def match_keyword_text(self, model, keyword: str, sentences: List[List[str]], text: str) -> float:
         if keyword in text:
@@ -58,3 +51,36 @@ class SimpleWord2VecMatcher:
         else:
             return 0.0
 
+
+class SentenceVecMatcher(Word2VecMatcher):
+    """Word2vec matcher based on whole sentences."""
+    def match_keyword_sentence(self, model, keyword, sentence: List) -> float:
+        if not keyword or not sentence:
+            return 0.0
+        result = model.wv.n_similarity([keyword], sentence)
+        if self.debug:
+            print("Matching {0} against {1} => {2}".format(keyword, sentence, result))
+        return result
+
+
+class NgramVecMatcher(Word2VecMatcher):
+    """Word2vec matcher based on n-grams."""
+    def __init__(self, n, debug=False):
+        super(NgramVecMatcher, self).__init__(debug=debug)
+        self.n = n
+
+    def match_ngram(self, model, keyword, ngram):
+        return model.wv.n_similarity([keyword], ngram)
+
+    def match_keyword_sentence(self, model, keyword, sentence: List) -> float:
+        from nltk import ngrams
+        if not keyword or not sentence:
+            return 0.0
+        ngram_matches = [self.match_ngram(model, keyword, ngram) for ngram in ngrams(sentence, self.n)]
+        if ngram_matches:
+            result = max(ngram_matches)
+        else:
+            result = 0.0
+        if self.debug:
+            print("Matching {0} against {1} => {2}".format(keyword, sentence, result))
+        return result
