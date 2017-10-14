@@ -1,6 +1,6 @@
-from googletrans import Translator
 from typing import List
 
+from .translating import translate
 
 
 def naive_matcher(text, keywords, text_language, keyword_language) -> float:
@@ -8,7 +8,6 @@ def naive_matcher(text, keywords, text_language, keyword_language) -> float:
 
 
 def simple_matcher(text: str, keywords: List[str], text_language: str, keyword_language: str) -> float:
-    translator = Translator()
-    keywords_translated = [translator.translate(keyword, text_language, keyword_language).text for keyword in keywords]
+    keywords_translated = [translate(keyword, text_language, keyword_language) for keyword in keywords]
     return sum(int(keyword in text) for keyword in keywords_translated) / len(keywords)
 

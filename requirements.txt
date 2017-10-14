@@ -2,4 +2,5 @@ googletrans
 gensim
 pyemd
 nltk
+click
 iso639

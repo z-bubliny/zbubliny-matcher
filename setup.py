@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-import itertools
 
 options = dict(
     name='zbubliny_matcher',
@@ -7,18 +6,11 @@ options = dict(
     packages=find_packages(),
     license='MIT',
     description='Matchers for zbubliny',
-    # long_description=__doc__.strip(),
-    # author='Jan Pipek',
-    # author_email='jan.pipek@gmail.com',
-    # url='https://github.com/janpipek/physt',
-    # package_data={"physt" : ["examples/*.csv"]},
-    install_requires = ['googletrans', 'gensim', 'pyemd', 'click'],
-    #extras_require = {
-    #    'all' : ['dask', 'matplotlib', 'bokeh', 'folium']
-    #},
+    install_requires = ['googletrans', 'gensim', 'pyemd', 'click', 'nltk'],
     entry_points = {
         'console_scripts' : [
-            'zbubliny = zbubliny_matcher.cli_interface:run'
+            'zbubliny = zbubliny_matcher.cli_interface:run',
+            'zbubliny-multi = zbubliny_matcher.cli_interface:run_multi'
         ]
     },
     classifiers=[
@@ -33,6 +25,4 @@ options = dict(
     ]
 )
 
-# extras = options['extras_require']
-# extras['full'] = list(set(itertools.chain.from_iterable(extras.values())))
 setup(**options)

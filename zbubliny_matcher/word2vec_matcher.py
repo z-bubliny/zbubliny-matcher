@@ -1,18 +1,15 @@
-from .chunkers import SimpleChunker
-from googletrans import Translator
 from typing import List
-import re
+
+from .chunkers import SimpleChunker
+from .exceptions import LanguageNotSupported
+from .translating import translate
 
 
-class LanguageNotSupported(RuntimeError):
-    pass
-
-
-class SimpleWord2VecMatcher:
-    def __init__(self, debug=True):
+class Word2VecMatcher:
+    """Abstract base class for word2vec matchers."""
+    def __init__(self, debug=False):
         self.models = {}
         self.chunker = SimpleChunker()
-        self.translator = Translator()
         self.debug = debug
 
     def add_language_model(self, language: str, model):
@@ -25,19 +22,15 @@ class SimpleWord2VecMatcher:
         if self.debug:
             print("Loaded model for {0} from {1}.".format(language, path))
 
-    def match_keyword_sentence(self, model, keyword, sentence: List) -> float:
-        if not keyword or not sentence:
-            return 0.0
-        result = model.wv.n_similarity([keyword], sentence)
-        if self.debug:
-            print("Matching {0} against {1} => {2}".format(keyword, sentence, result))
-        return result
-
     def match_keyword_text(self, model, keyword: str, sentences: List[List[str]], text: str) -> float:
         if keyword in text:
             return 1.0
         elif keyword in model.wv.vocab:
-            return max(self.match_keyword_sentence(model, keyword, sentence) for sentence in sentences)
+            scores = [self.match_keyword_sentence(model, keyword, sentence) for sentence in sentences]
+            if scores:
+                return max(scores)
+            else:
+                return 0.0
         else:
             return 0.0
 
@@ -51,8 +44,43 @@ class SimpleWord2VecMatcher:
             [word for word in self.chunker.chunk_words(sentence) if word in model.wv.vocab]
             for sentence in self.chunker.chunk_sentences(text)
         ]
-        try:
-            keywords_translated = [self.translator.translate(keyword, text_language, keyword_language).text for keyword in keywords]
-        except ValueError:
-            raise LanguageNotSupported("Google translate does not support translation from {0} to {1}.".format(keyword_language, text_language))
-        return max(self.match_keyword_text(model, keyword, sentences, text) for keyword in keywords_translated)
+        keywords_translated = [translate(keyword, text_language, keyword_language) for keyword in keywords]
+        scores = [self.match_keyword_text(model, keyword, sentences, text) for keyword in keywords_translated]
+        if scores:
+            return max(scores)
+        else:
+            return 0.0
+
+
+class SentenceVecMatcher(Word2VecMatcher):
+    """Word2vec matcher based on whole sentences."""
+    def match_keyword_sentence(self, model, keyword, sentence: List) -> float:
+        if not keyword or not sentence:
+            return 0.0
+        result = model.wv.n_similarity([keyword], sentence)
+        if self.debug:
+            print("Matching {0} against {1} => {2}".format(keyword, sentence, result))
+        return result
+
+
+class NgramVecMatcher(Word2VecMatcher):
+    """Word2vec matcher based on n-grams."""
+    def __init__(self, n, debug=False):
+        super(NgramVecMatcher, self).__init__(debug=debug)
+        self.n = n
+
+    def match_ngram(self, model, keyword, ngram):
+        return model.wv.n_similarity([keyword], ngram)
+
+    def match_keyword_sentence(self, model, keyword, sentence: List) -> float:
+        from nltk import ngrams
+        if not keyword or not sentence:
+            return 0.0
+        ngram_matches = [self.match_ngram(model, keyword, ngram) for ngram in ngrams(sentence, self.n)]
+        if ngram_matches:
+            result = max(ngram_matches)
+        else:
+            result = 0.0
+        if self.debug:
+            print("Matching {0} against {1} => {2}".format(keyword, sentence, result))
+        return result
