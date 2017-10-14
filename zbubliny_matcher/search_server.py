@@ -8,7 +8,7 @@ from .database_scanner import DatabaseScanner
 app = Flask(__name__)
 
 
-@app.route('/search', methods=['GET'])
+@app.route('/api/search', methods=['GET'])
 def get_search():
     keywords = request.args.get("keywords")
     language = request.args.get("lang", "cs")
