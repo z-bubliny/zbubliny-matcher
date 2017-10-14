@@ -1,6 +1,5 @@
 from nltk.tokenize import sent_tokenize
-from nltk.tokenize.moses import MosesTokenizer
-import iso639
+
 
 class SimpleChunker:
     def chunk_words(self, sentence, language=''):
@@ -9,8 +8,10 @@ class SimpleChunker:
     def chunk_sentences(self, text, language=''):
         return [ t.strip() for t in text.strip().split(".") if t.strip() ]
 
+
 class MosesChunker():
     def chunk_sentences(self, text, language='en'):
+        import iso639
         lang = iso639.to_name(language).lower()
         try:
             sentences = sent_tokenize(text, lang)
@@ -19,6 +20,7 @@ class MosesChunker():
         return sentences
 
     def chunk_words(self, sentence, language='en'):
+        from nltk.tokenize.moses import MosesTokenizer
         tokenizer = MosesTokenizer(lang=language)
         return tokenizer.tokenize(sentence)
 

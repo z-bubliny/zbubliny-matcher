@@ -1,16 +1,45 @@
 from typing import List
 
-from .chunkers import SimpleChunker
+from .chunkers import SimpleChunker, MosesChunker
 from .exceptions import LanguageNotSupported
 from .translating import translate
 
 
-class Word2VecMatcher:
+class Matcher:
     """Abstract base class for word2vec matchers."""
-    def __init__(self, debug=False):
-        self.models = {}
-        self.chunker = SimpleChunker()
+    def __init__(self, debug=False, chunker=MosesChunker()):
+        self.chunker = chunker
         self.debug = debug
+
+    def translate_keywords(self, keywords: List[str], text_language: str, keyword_language: str):
+        return [translate(keyword, text_language, keyword_language) for keyword in keywords]
+
+    def __call__(self, text: str, keywords: List[str], text_language: str, keyword_language: str) -> float:
+        raise NotImplementedError()
+
+
+class SimpleMatcher(Matcher):
+    """Matcher just looking for the keywords in the chunked text."""
+    def match_keyword_text(self, words, keyword) -> float:
+        return int(keyword in words)
+
+    def __call__(self, text: str, keywords: List[str], text_language: str, keyword_language: str) -> float:
+        text = text.lower()
+        words = self.chunker.chunk_words(text)
+        keywords_translated = self.translate_keywords(keywords, text_language=text_language,
+                                                      keyword_language=keyword_language)
+        scores = [self.match_keyword_text(words, keyword) for keyword in keywords_translated]
+        if scores:
+            return max(scores)
+        else:
+            return 0.0
+
+
+class Word2VecMatcher(Matcher):
+    """Abstract base class for word2vec matchers."""
+    def __init__(self, *args, **kwargs):
+        super(Word2VecMatcher, self).__init__(*args, **kwargs)
+        self.models = {}
 
     def add_language_model(self, language: str, model):
         self.models[language] = model
@@ -34,7 +63,11 @@ class Word2VecMatcher:
         else:
             return 0.0
 
+    def match_keyword_sentence(self, model, keyword, sentence: List) -> float:
+        raise NotImplementedError()
+
     def __call__(self, text: str, keywords: List[str], text_language: str, keyword_language: str) -> float:
+        text = text.lower()
         if not self.models:
             raise LanguageNotSupported("There is no model for language: {0}, please try loading at least one model first.".format(text_language))
         model = self.models.get(text_language)
@@ -44,7 +77,7 @@ class Word2VecMatcher:
             [word for word in self.chunker.chunk_words(sentence) if word in model.wv.vocab]
             for sentence in self.chunker.chunk_sentences(text)
         ]
-        keywords_translated = [translate(keyword, text_language, keyword_language) for keyword in keywords]
+        keywords_translated = self.translate_keywords(keywords, text_language=text_language, keyword_language=keyword_language)
         scores = [self.match_keyword_text(model, keyword, sentences, text) for keyword in keywords_translated]
         if scores:
             return max(scores)
@@ -65,8 +98,8 @@ class SentenceVecMatcher(Word2VecMatcher):
 
 class NgramVecMatcher(Word2VecMatcher):
     """Word2vec matcher based on n-grams."""
-    def __init__(self, n, debug=False):
-        super(NgramVecMatcher, self).__init__(debug=debug)
+    def __init__(self, n, *args, **kwargs):
+        super(NgramVecMatcher, self).__init__(*args, **kwargs)
         self.n = n
 
     def match_ngram(self, model, keyword, ngram):

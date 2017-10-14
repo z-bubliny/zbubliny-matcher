@@ -13,7 +13,7 @@ import codecs
 @click.option('-d', "--debug", is_flag=True)
 @click.argument("keywords", nargs=-1)
 def run_it(keywords, vector_dir, text_dir, keyword_language, source_language, limit, debug):
-    from zbubliny_matcher.word2vec_matcher import SentenceVecMatcher
+    from zbubliny_matcher.matchers import SentenceVecMatcher
 
     m = SentenceVecMatcher(debug=debug)
     m.load_language_model(source_language, os.path.join(vector_dir, "wiki.{0}.vec".format(source_language)))
@@ -42,7 +42,7 @@ def run():
 @click.option('-d', "--debug", is_flag=True)
 @click.argument("keywords", nargs=-1)
 def run_it_multi(keywords, vector_dir, text_dir, keyword_language, source_language, limit, debug):
-    from zbubliny_matcher.word2vec_matcher import SentenceVecMatcher, NgramVecMatcher
+    from zbubliny_matcher.matchers import SentenceVecMatcher, NgramVecMatcher
 
     m = SentenceVecMatcher(debug=debug)
     m.load_language_model(source_language, os.path.join(vector_dir, "wiki.{0}.vec".format(source_language)))

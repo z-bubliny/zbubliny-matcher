@@ -14,7 +14,7 @@ def translate(word, source_language, target_language):
             try:
                 translator = Translator()
                 result = translator.translate(word, source_language, target_language).text
-                return result
+                return result.lower()
             except json.JSONDecodeError:
                 pass
     except ValueError:
