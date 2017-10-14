@@ -54,7 +54,7 @@ def webhook():
                                 ds = DatabaseScanner()
                                 ds.all = True
                                 reply = ""
-                                for article, relevance in ds.search_keywords([word.split()], keyword_language="cs", limit=5):
+                                for article, relevance in ds.search_keywords(word.split(), keyword_language="cs", limit=5):
                                     reply += "{0} : {1}\n\n".format(article["title"], article["source"])
                             else:
                                 reply = "Unknown command: {0}".format(cmd)
