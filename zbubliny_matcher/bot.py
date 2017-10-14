@@ -46,34 +46,37 @@ def webhook():
                         try:
                             message_text = messaging_event["message"]["text"]  # the message's text
 
-                            cmd, word = message_text.split(" ", 1)
-                            if cmd == "subscribe":
-                                reply = "Wll be implemented soon"
-                            elif cmd == "history":
-                                from .database_scanner import DatabaseScanner
-                                ds = DatabaseScanner()
-                                ds.all = True
-                                reply = ""
-                                for article, relevance in ds.search_keywords(word.split(), keyword_language="cs", limit=5):
-                                    reply += "{0} : {1}\n\n".format(article["title"], article["source"])
+                            if " " in message_text:
+                                cmd, word = message_text.split(" ", 1)
+                                if cmd == "subscribe":
+                                    reply = "Wll be implemented soon"
+                                elif cmd == "history":
+                                    from .database_scanner import DatabaseScanner
+                                    ds = DatabaseScanner()
+                                    ds.all = True
+                                    reply = ""
+                                    for article, relevance in ds.search_keywords(word.split(), keyword_language="cs", limit=5):
+                                        reply += "{0} : {1}\n\n".format(article["title"], article["source"])
+                                else:
+                                    reply = "Unknown command: {0}".format(cmd)
                             else:
-                                reply = "Unknown command: {0}".format(cmd)
+                                reply = "I don't understand"
 
                             send_message(sender_id, str(reply))
-                        except ArithmeticError as be:
+                        except BaseException as be:
                             print(be)
                             send_message(sender_id,str("Sorry! I didn't get that."))
                     if messaging_event.get("delivery"):  # delivery confirmation
                         pass
 
-                    if messaging_event.get("optin"):  # optin confirmation
+                    if messaging_event.get("option"):  # optin confirmation
                         pass
 
                     if messaging_event.get("postback"):  # user clicked/tapped "postback" button in earlier message
                         pass
 
         return "ok", 200
-    except ArithmeticError:
+    except:
         return "not ok", 200
 
 
