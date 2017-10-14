@@ -1,6 +1,6 @@
 from typing import List
 
-from .chunkers import SimpleChunker, MosesChunker
+from .chunkers import MosesChunker
 from .exceptions import LanguageNotSupported
 from .translating import translate
 
