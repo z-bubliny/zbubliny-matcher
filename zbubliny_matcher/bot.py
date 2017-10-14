@@ -46,6 +46,8 @@ def webhook():
                         try:
                             message_text = messaging_event["message"]["text"].strip()  # the message's text
 
+                            print("IN>", message_text)
+
                             if " " in message_text:
                                 cmd, word = message_text.split(" ", 1)
                                 cmd = cmd.lower()
