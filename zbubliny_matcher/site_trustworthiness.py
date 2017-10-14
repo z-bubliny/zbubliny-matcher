@@ -14,7 +14,7 @@ class WOT_API:
 
     @staticmethod
     def get_trustworthiness(host):
-        """Returns number between 0 - 100, meaning the site trustworthyness in percent, returns -1 if site unknown"""
+        """Returns number between 0 - 100, meaning the site trustworthiness in percent, returns -1 if site unknown"""
         try:
             response = WOT_API.get_rating(host)
             return response[list(response.keys())[0]]["0"][0]
@@ -33,7 +33,10 @@ class WOT_API:
         flag_database = {101: "Malware or viruses", 102: "Poor costumer experience", 103:"Phishing", 104:"Scam", 105:"Potentially illegal", 201:"Misleading or unethical", 202: "Privacy risks", 203:"Suspicious", 204:"Hate", 205:"Spam", 206:"Potentially unwanted programs", 207:"Ads / pop-ups", 301:"Online tracking", 302:"Alternative or controversial medicine", 303: "Opinions, religion, politics", 304: "Other", 501:"Good site", 401:"Adult content", 402:"Nudity", 403:"Gruesome"}
 
         for key in hazards:
-            flags[flag_database[int(key)]] = hazards[key]
+            if flag_database.__contains__(int(key)):
+                flags[flag_database[int(key)]] = hazards[key]
+            else:
+                flags[key] = hazards[key]
 
         return flags
 
