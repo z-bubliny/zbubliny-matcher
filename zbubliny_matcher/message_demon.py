@@ -27,11 +27,17 @@ class MessageDemon:
     def process_message(self, message):
         id, source, title, text, image_url = message
         subscriptions = self.manager.get_subscriptions()
+        print("Processing {0}...".format(title))
         for fb_id, keyword in subscriptions:
             quality = self.matcher(title + text, [keyword], text_language="en", keyword_language="cs")
             if quality:
+                print("Matched: {0}, sending to {1}".format(keyword, fb_id))
                 reply = "{0} : {1}\n\n".format(title, source)
-                send_message(fb_id, reply)
+                try:
+                    send_message(fb_id, reply)
+                except BaseException as be:
+                    print("Error: {0}".format(be))
+                    pass
 
 
 @click.command()
