@@ -17,8 +17,8 @@ def get_search():
         ds = DatabaseScanner(all=all)
 
         def generate():
-            yield "KEYWORDS: `{0}`\n".format(keywords)
-            yield "LANGUAGE: `{0}`\n".format(language)
+            # yield "KEYWORDS: `{0}`\n".format(keywords)
+            # yield "LANGUAGE: `{0}`\n".format(language)
 
             for row in ds.search_keywords(keywords, language):
                 article, relevance = row
@@ -27,10 +27,12 @@ def get_search():
                 yield json.dumps(data) + '\n'
                 time.sleep(1)
 
-        return Response(generate(), mimetype='text/plain')
+        response = Response(generate(), mimetype='text/plain')
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
 
     else:
-        return "?keywords=...,...,...", 400
+        return "Please add valid query string ?keywords=...,...,...", 400
 
 
 @click.command()

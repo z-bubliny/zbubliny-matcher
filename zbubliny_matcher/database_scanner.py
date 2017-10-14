@@ -30,6 +30,7 @@ class DatabaseScanner:
 
     def fetch_articles(self):
         query = "SELECT language, title, body, source FROM {0}".format(self.table_name)
+        print(query)
         cursor = self.get_cursor()
         cursor.execute(query)
         return ({
@@ -40,7 +41,11 @@ class DatabaseScanner:
         } for row in cursor.fetchall())
 
     def search_keywords(self, keywords, keyword_language):
+        checked = set()
         for article in self.fetch_articles():
+            if article["source"] in checked:
+                continue
+            checked.add(article["source"])
             relevance = self.matcher(article["title"] + article["body"], keywords, article["language"] or "en", keyword_language)
             if relevance > self.threshold:
                 yield article, relevance
