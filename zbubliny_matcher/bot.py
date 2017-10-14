@@ -9,7 +9,8 @@ import requests
 from flask import Flask, request
 
 app = Flask(__name__)
-
+from werkzeug.contrib.fixers import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 @app.route('/', methods=['GET'])
 def verify():
@@ -98,6 +99,7 @@ def send_message(recipient_id, message_text):
 @click.option("-p", "--port", default=8888)
 def run_server(port):
     app.run(debug=False, host="0.0.0.0", port=port)
+
 
 
 if __name__ == '__main__':

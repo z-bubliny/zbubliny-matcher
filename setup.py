@@ -6,7 +6,7 @@ options = dict(
     packages=find_packages(),
     license='MIT',
     description='Matchers for zbubliny',
-    install_requires = ['googletrans', 'gensim', 'pyemd', 'click', 'nltk', 'psycopg2'],
+    install_requires = ['googletrans', 'gensim', 'pyemd', 'click', 'nltk', 'psycopg2', 'awscli'],
     entry_points = {
         'console_scripts' : [
             'zbubliny = zbubliny_matcher.cli_interface:run',
