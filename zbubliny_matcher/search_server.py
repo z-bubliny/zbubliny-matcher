@@ -25,7 +25,6 @@ def get_search():
                 data = {val : article[val] for val in ("title", "source")}
                 data["relevance"] = relevance
                 yield json.dumps(data) + '\n'
-                time.sleep(1)
 
         response = Response(generate(), mimetype='text/event-stream')
         response.headers['Access-Control-Allow-Origin'] = '*'
