@@ -12,22 +12,22 @@ app = Flask(__name__)
 def get_search():
     keywords = request.args.get("keywords")
     language = request.args.get("lang", "cs")
+    count = request.args.get("count", 5)
     if keywords:
         keywords = keywords.split(",")
         ds = DatabaseScanner(all=all)
 
-        def generate():
-            # yield "KEYWORDS: `{0}`\n".format(keywords)
-            # yield "LANGUAGE: `{0}`\n".format(language)
+        results = []
+        for i, row in enumerate(ds.search_keywords(keywords, language)):
+            article, relevance = row
+            data = {val : article[val] for val in ("title", "source")}
+            data["relevance"] = relevance
+            results.append(data)
+            if i >= count:
+                break
 
-            for row in ds.search_keywords(keywords, language):
-                article, relevance = row
-                data = {val : article[val] for val in ("title", "source")}
-                data["relevance"] = relevance
-                yield json.dumps(data) + '\n'
-
-        response = Response(generate(), mimetype='text/event-stream')
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        response = Response(json.dumps(results), mimetype='text/json')
+        # response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
     else:
