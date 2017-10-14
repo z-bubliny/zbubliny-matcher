@@ -10,7 +10,8 @@ options = dict(
     entry_points = {
         'console_scripts' : [
             'zbubliny = zbubliny_matcher.cli_interface:run',
-            'zbubliny-multi = zbubliny_matcher.cli_interface:run_multi'
+            'zbubliny-multi = zbubliny_matcher.cli_interface:run_multi',
+            'zbubliny-db-search = zbubliny_matcher.database_scanner:run_scanner'
         ]
     },
     classifiers=[
