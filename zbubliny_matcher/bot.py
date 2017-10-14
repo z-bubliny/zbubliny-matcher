@@ -60,7 +60,7 @@ def webhook():
                                 reply = "Unknown command: {0}".format(cmd)
 
                             send_message(sender_id, str(reply))
-                        except BaseException as be:
+                        except ArithmeticError as be:
                             print(be)
                             send_message(sender_id,str("Sorry! I didn't get that."))
                     if messaging_event.get("delivery"):  # delivery confirmation
@@ -73,7 +73,7 @@ def webhook():
                         pass
 
         return "ok", 200
-    except:
+    except ArithmeticError:
         return "not ok", 200
 
 
