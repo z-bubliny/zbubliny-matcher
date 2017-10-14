@@ -50,19 +50,20 @@ def webhook():
                                 cmd, word = message_text.split(" ", 1)
                                 if cmd == "subscribe":
                                     reply = "Wll be implemented soon"
+                                    send_message(sender_id, str(reply))
                                 elif cmd == "history":
                                     from .database_scanner import DatabaseScanner
                                     ds = DatabaseScanner()
                                     ds.all = True
-                                    reply = ""
                                     for article, relevance in ds.search_keywords(word.split(), keyword_language="cs", limit=5):
-                                        reply += "{0} : {1}\n\n".format(article["title"], article["source"])
+                                        reply = "{0} : {1}\n\n".format(article["title"], article["source"])
+                                        send_message(sender_id, str(reply))
                                 else:
                                     reply = "Unknown command: {0}".format(cmd)
                             else:
                                 reply = "I don't understand"
 
-                            send_message(sender_id, str(reply))
+                                send_message(sender_id, str(reply))
                         except BaseException as be:
                             print(be)
                             send_message(sender_id,str("Sorry! I didn't get that."))
