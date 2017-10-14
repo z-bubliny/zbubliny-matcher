@@ -37,7 +37,11 @@ class SimpleWord2VecMatcher:
         if keyword in text:
             return 1.0
         elif keyword in model.wv.vocab:
-            return max(self.match_keyword_sentence(model, keyword, sentence) for sentence in sentences)
+            scores = [self.match_keyword_sentence(model, keyword, sentence) for sentence in sentences]
+            if scores:
+                return max(scores)
+            else:
+                return 0.0
         else:
             return 0.0
 
@@ -55,4 +59,9 @@ class SimpleWord2VecMatcher:
             keywords_translated = [self.translator.translate(keyword, text_language, keyword_language).text for keyword in keywords]
         except ValueError:
             raise LanguageNotSupported("Google translate does not support translation from {0} to {1}.".format(keyword_language, text_language))
-        return max(self.match_keyword_text(model, keyword, sentences, text) for keyword in keywords_translated)
+        scores = [self.match_keyword_text(model, keyword, sentences, text) for keyword in keywords_translated]
+        if scores:
+            return max(scores)
+        else:
+            return 0.0
+
