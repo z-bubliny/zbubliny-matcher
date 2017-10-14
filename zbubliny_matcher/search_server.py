@@ -28,7 +28,7 @@ def get_search():
                 break
 
         response = Response(json.dumps(results), mimetype='text/json')
-        # response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
     else:
