@@ -45,15 +45,16 @@ class DatabaseScanner:
 
     def search_keywords(self, keywords, keyword_language, limit=1000000):
         checked = set()
-        for i, article in enumerate(self.fetch_articles()):
+        found = 0
+        for article in self.fetch_articles():
             if article["source"] in checked:
                 continue
             checked.add(article["source"])
             relevance = self.matcher(article["title"] + article["body"], keywords, article["language"] or "en", keyword_language)
             if relevance > self.threshold:
                 yield article, relevance
-                i += 1
-            if i >= limit:
+                found += 1
+            if found >= limit:
                 return
 
 
