@@ -6,14 +6,15 @@ options = dict(
     packages=find_packages(),
     license='MIT',
     description='Matchers for zbubliny',
-    install_requires = ['googletrans', 'gensim', 'pyemd', 'click', 'nltk', 'psycopg2', 'awscli'],
+    install_requires = ['googletrans', 'gensim', 'pyemd', 'click', 'nltk', 'psycopg2', 'awscli', 'boto3'],
     entry_points = {
         'console_scripts' : [
             'zbubliny = zbubliny_matcher.cli_interface:run',
             'zbubliny-multi = zbubliny_matcher.cli_interface:run_multi',
             'zbubliny-db-search = zbubliny_matcher.database_scanner:run_scanner',
             'zbubliny-server = zbubliny_matcher.search_server:run_server',
-            'zbubliny-fb-bot = zbubliny_matcher.bot:run_server'
+            'zbubliny-fb-bot = zbubliny_matcher.bot:run_server',
+            'zbubliny-demon = zbubliny_matcher.message_demon:run'
         ]
     },
     classifiers=[

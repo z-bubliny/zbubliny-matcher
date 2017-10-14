@@ -58,11 +58,6 @@ def webhook():
                                     for keyword in word.split():
                                         if keyword == "rakovina":
                                             send_message(sender_id, "\u2620 For how long do you want to be subscribed? \u2620")
-                                            import time
-                                            time.sleep(3)
-                                            for t in range(10, 0, -1):
-                                                send_message(sender_id, "{0}...".format(t))
-                                                time.sleep(1)
                                         sm.subscribe(sender_id, keyword)
                                     send_message(sender_id, "Thanks, you will receive messages!")
                                 elif cmd == "unsubscribe":
