@@ -1,24 +1,16 @@
 from setuptools import setup, find_packages
-import itertools
-from physt import __version__
 
 options = dict(
     name='zbubliny_matcher',
-    version=__version__,
+    version='0.0.1',
     packages=find_packages(),
     license='MIT',
     description='Matchers for zbubliny',
-    # long_description=__doc__.strip(),
-    # author='Jan Pipek',
-    # author_email='jan.pipek@gmail.com',
-    # url='https://github.com/janpipek/physt',
-    # package_data={"physt" : ["examples/*.csv"]},
-    install_requires = ['googletrans'],
-    #extras_require = {
-    #    'all' : ['dask', 'matplotlib', 'bokeh', 'folium']
-    #},
+    install_requires = ['googletrans', 'gensim', 'pyemd', 'click', 'nltk', 'psycopg2'],
     entry_points = {
         'console_scripts' : [
+            'zbubliny = zbubliny_matcher.cli_interface:run',
+            'zbubliny-multi = zbubliny_matcher.cli_interface:run_multi'
         ]
     },
     classifiers=[
@@ -33,6 +25,4 @@ options = dict(
     ]
 )
 
-# extras = options['extras_require']
-# extras['full'] = list(set(itertools.chain.from_iterable(extras.values())))
 setup(**options)

@@ -1,3 +1,7 @@
 googletrans
 gensim
 pyemd
+nltk
+click
+iso639
+psycopg2

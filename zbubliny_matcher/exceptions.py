@@ -1,0 +1,2 @@
+class LanguageNotSupported(RuntimeError):
+    pass
