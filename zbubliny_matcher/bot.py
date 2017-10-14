@@ -44,13 +44,31 @@ def webhook():
                         sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
                         recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
                         try:
-                            message_text = messaging_event["message"]["text"]  # the message's text
+                            message_text = messaging_event["message"]["text"].strip()  # the message's text
 
                             if " " in message_text:
                                 cmd, word = message_text.split(" ", 1)
+                                cmd = cmd.lower()
+
                                 if cmd == "subscribe":
-                                    reply = "Wll be implemented soon"
-                                    send_message(sender_id, str(reply))
+                                    from .subscription_manager import SubscriptionManager
+                                    sm = SubscriptionManager()
+                                    for keyword in word.split():
+                                        if keyword == "rakovina":
+                                            send_message(sender_id, "\u2620 For how long do you want to be subscribed? \u2620")
+                                            import time
+                                            time.sleep(3)
+                                            for t in range(10, 0, -1):
+                                                send_message(sender_id, "{0}...".format(t))
+                                                time.sleep(1)
+                                        sm.subscribe(sender_id, keyword)
+                                    send_message(sender_id, "Thanks, you will receive messages!")
+                                elif cmd == "unsubscribe":
+                                    from .subscription_manager import SubscriptionManager
+                                    sm = SubscriptionManager()
+                                    for keyword in word.split():
+                                        sm.unsubscribe(sender_id, keyword)
+                                    send_message(sender_id, "Thanks, unsubscribed!")
                                 elif cmd == "history":
                                     from .database_scanner import DatabaseScanner
                                     ds = DatabaseScanner()
