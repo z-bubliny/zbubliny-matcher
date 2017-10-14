@@ -33,12 +33,12 @@ class DatabaseScanner:
         print(query)
         cursor = self.get_cursor()
         cursor.execute(query)
-        return ({
+        yield from ({
             "language": row[0],
             "title": row[1],
             "body": row[2],
             "source": row[3]
-        } for row in cursor.fetchall())
+        } for row in cursor)
 
     def search_keywords(self, keywords, keyword_language):
         checked = set()
