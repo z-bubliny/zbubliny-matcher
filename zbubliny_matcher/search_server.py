@@ -12,7 +12,7 @@ app = Flask(__name__)
 def get_search():
     keywords = request.args.get("keywords")
     language = request.args.get("lang", "cs")
-    count = request.args.get("count", 5)
+    count = int(request.args.get("count", 5))
     all = request.args.get("all", False)
     if keywords:
         keywords = keywords.split(",")
