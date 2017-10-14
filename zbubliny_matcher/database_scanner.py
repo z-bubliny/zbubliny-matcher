@@ -50,6 +50,7 @@ class DatabaseScanner:
 @click.option("-l", "--language", default="cs")
 @click.option("-a", "--all", is_flag=True)
 @click.option("-t", "--trustworthiness", is_flag=True)
+# @click.option("-")
 @click.argument("keywords", nargs=-1)
 def run_scanner(keywords, language, trustworthiness, all):
     ds = DatabaseScanner(all=all)
@@ -57,4 +58,5 @@ def run_scanner(keywords, language, trustworthiness, all):
         if trustworthiness:
             nice = WOT_API.get_trustworthiness(article["source"])
             print("* {0} {1} [{2} %]".format(article["title"], article["source"], nice))
-        print("* {0} {1}".format(article["title"], article["source"]))
+        else:
+            print("* {0} {1}".format(article["title"], article["source"]))
