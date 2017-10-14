@@ -117,3 +117,48 @@ class NgramVecMatcher(Word2VecMatcher):
         if self.debug:
             print("Matching {0} against {1} => {2}".format(keyword, sentence, result))
         return result
+
+
+class FirstNMatcher(Word2VecMatcher):
+    """Word2vec matcher based on weighted most similar words."""
+    def __init__(self, n, *args, **kwargs):
+        super(FirstNMatcher, self).__init__(*args, **kwargs)
+        self.n = n
+
+    def compute_submodel(self, model, text):
+        from numpy import unique
+        u, c = unique(self.chunker.chunk_words(text), return_counts=True)
+        c = c / sum(c)
+        subwv = []
+        wvc = []
+        for i, w in enumerate(u):
+            if w in model:
+                subwv.append((w, model[w]))
+                wvc.append((w, c[i]))
+
+        subwv = [(word, vector) for (word, vector) in subwv if len(word) > 1]
+        wvc = [(word, count) for (word, count) in wvc if len(word) > 1]
+        return dict(subwv), dict(wvc)
+
+    def vector_sim(self, v1, v2):
+        """
+        Compute cosine similarity between two words.
+        """
+        from numpy import dot
+        from gensim import matutils
+        return dot(matutils.unitvec(v1), matutils.unitvec(v2))
+
+    def match_keyword_text(self, model, keyword: str, sentences: List[List[str]], text: str):
+        submodel, word_counts = self.compute_submodel(model, text)
+        from numpy import sort, mean
+        similarities = []
+        for word, wordvector in submodel.items():
+            similarity = self.vector_sim(model[keyword], wordvector)
+            similarities.append((word, similarity * word_counts[word]))
+        most_similar = sort([s for _, s in similarities])[-self.n:]
+        print(keyword, most_similar)
+        similarity = mean(most_similar)
+        return similarity
+
+    def match_keyword_sentence(self, model, keyword, sentence: List):
+        pass
