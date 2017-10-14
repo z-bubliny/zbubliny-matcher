@@ -34,8 +34,13 @@ def get_search():
 
 
 @click.command()
-def run_server():
-    app.run(debug=True)
+@click.option("-p", "--public-ip", is_flag=True)
+@click.option("-n", "--port-number", default=5000)
+def run_server(public_ip, port_number):
+    if public_ip:
+        app.run(host = '0.0.0.0', debug=False, port=port_number)
+    else:
+        app.run(debug=True, port=port_number)
 
 if __name__ == '__main__':
     run_server()
