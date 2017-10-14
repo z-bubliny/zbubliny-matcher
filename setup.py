@@ -12,7 +12,8 @@ options = dict(
             'zbubliny = zbubliny_matcher.cli_interface:run',
             'zbubliny-multi = zbubliny_matcher.cli_interface:run_multi',
             'zbubliny-db-search = zbubliny_matcher.database_scanner:run_scanner',
-            'zbubliny-server = zbubliny_matcher.search_server:run_server'
+            'zbubliny-server = zbubliny_matcher.search_server:run_server',
+            'zbubliny-fb-bot = zbubliny_matcher.bot:run_server'
         ]
     },
     classifiers=[
