@@ -28,3 +28,9 @@ class SubscriptionManager:
         cursor = self.get_cursor()
         cursor.execute(sql, (str(id), str(keyword)))
         cursor.connection.commit()
+
+    def get_subscriptions(self):
+        sql = "SELECT fb_id, keyword FROM subscription"
+        cursor = self.get_cursor()
+        cursor.execute(sql)
+        return cursor.fetchall()
